@@ -3,13 +3,23 @@ import { TodoListPresenterImpl, type TodoListViewModel } from "@/todoList/adapte
 import { ref } from "vue";
 import { ChargerTodoListUsecase } from "@/todoList/chargerTodoListUsecase";
 import { TodoListRepositoryInMemory } from "@/todoList/adapters/todoList.repository.inmemory";
+import { ChangerStatusTodoItemUsecase } from "@/todoList/changerStatusTodoItemUsecase";
 
 const todoListViewModel = ref<TodoListViewModel>();
 
-const chargerToDoListUsecase = new ChargerTodoListUsecase(new TodoListRepositoryInMemory())
+const todoListRepositoryInMemory = new TodoListRepositoryInMemory();
+const chargerToDoListUsecase = new ChargerTodoListUsecase(todoListRepositoryInMemory)
 chargerToDoListUsecase.execute(new TodoListPresenterImpl((viewModel) => {
   todoListViewModel.value = viewModel;
 }));
+
+const changeToDone = (id:number) => {
+  const changerStatusUsecase = new ChangerStatusTodoItemUsecase(todoListRepositoryInMemory);
+  changerStatusUsecase.execute(id, 'done');
+  chargerToDoListUsecase.execute(new TodoListPresenterImpl((viewModel) => {
+    todoListViewModel.value = viewModel;
+  }));
+}
 </script>
 
 <template>
@@ -22,11 +32,14 @@ chargerToDoListUsecase.execute(new TodoListPresenterImpl((viewModel) => {
           v-if="todoListViewModel"
           v-for="item in todoListViewModel.items"
           :key="item.id">
-        {{ item.title }}
+        {{ item.title }} - {{item.status}}
+
+        <button @click="changeToDone(item.id)">Done</button>
       </li>
     </ul>
   </div>
 </template>
+
 
 <style scoped>
 

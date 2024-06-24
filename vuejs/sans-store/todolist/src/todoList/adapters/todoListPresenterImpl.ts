@@ -4,7 +4,7 @@ import type { TodoList } from "@/todoList/chargerTodoListUsecase";
 interface TodoListItemViewModel {
     id: number;
     title: string;
-    completed: boolean;
+    status: string;
 }
 
 export interface TodoListViewModel {
@@ -20,7 +20,7 @@ export class TodoListPresenterImpl implements TodoListPresenter {
             items: todoList.items.map(item => ({
                 id: item.id,
                 title: `${item.id}. ${item.title}`,
-                completed: item.completed,
+                status: item.status,
             }))
         });
     }
